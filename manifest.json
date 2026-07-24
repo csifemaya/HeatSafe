@@ -1,0 +1,4 @@
+{"name": "CSIF HeatSafe", "short_name": "HeatSafe", "start_url": "./index.html", "display": "standalone", 
+"background_color": "#00529B", "theme_color": "#00529B", "description": "Aplicación para evaluar riesgo térmico", 
+"icons": [{"src": "img/icon-192.png", "sizes": "192x192", "type": "image/png"}, {"src": "img/icon-512.png", 
+"sizes": "512x512", "type": "image/png"}]}

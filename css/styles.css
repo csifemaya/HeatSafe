@@ -1,0 +1,39 @@
+/* File: css/styles.css */
+:root {
+  --brand: #00529B;
+  --brand-strong: #003b6f;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #14213d;
+  --muted: #6c757d;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --success: #198754;
+}
+body {
+  background: linear-gradient(180deg, var(--bg) 0%, #e8f1f8 100%);
+  color: var(--text);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+body.dark {
+  --bg: #101725;
+  --card: #162033;
+  --text: #f4f7fb;
+  --muted: #aeb7c2;
+}
+.card {
+  border-radius: 1rem;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.card:hover { transform: translateY(-2px); }
+.text-primary { color: var(--brand) !important; }
+.btn-primary { background: var(--brand); border-color: var(--brand); }
+.btn-primary:hover { background: var(--brand-strong); border-color: var(--brand-strong); }
+.map-container { height: 260px; border-radius: 1rem; overflow: hidden; }
+.list-group-item { border-radius: .75rem; margin-bottom: .5rem; }
+.badge { font-size: .8rem; }
+body.dark .bg-light { background: rgba(255,255,255,.08) !important; color: var(--text) !important; }
+body.dark .form-control, body.dark .form-select, body.dark .table { color: var(--text); background: var(--card); border-color: #2c3d59; }
+body.dark .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(255,255,255,.03); }
+body.dark .alert-info { background-color: rgba(0,82,155,.25); color: #dce9f7; }
+@media (max-width: 768px) { .container { padding-left: 1rem; padding-right: 1rem; } }

@@ -1,0 +1,254 @@
+<!-- File: index.html -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00529B">
+  <title>CSIF HeatSafe</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container py-3">
+    <header class="card shadow-sm border-0 mb-3">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+          <div>
+            <h1 class="h4 mb-1 text-primary">CSIF HeatSafe</h1>
+            <p class="mb-0 text-muted">Evaluación de riesgo por estrés térmico para trabajos al aire libre</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" id="refreshWeather">Actualizar</button>
+            <button class="btn btn-primary" id="saveHistoryBtn">Guardar registro</button>
+          </div>
+        </div>
+        <div class="mt-3 d-flex flex-wrap gap-2">
+          <span class="badge rounded-pill bg-primary-subtle text-primary" id="clockBadge"></span>
+          <span class="badge rounded-pill bg-info-subtle text-info" id="statusBadge">Obteniendo datos…</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav nav-pills nav-fill mb-3" role="tablist">
+      <button class="nav-link active" data-tab="overview">Inicio</button>
+      <button class="nav-link" data-tab="history">Historial</button>
+      <button class="nav-link" data-tab="config">Configuración</button>
+    </nav>
+
+    <section id="overview" class="tab-pane active">
+      <div class="row g-3">
+        <div class="col-lg-7">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h2 class="h5 mb-1">Situación actual</h2>
+                  <p class="text-muted mb-0" id="locationText">Localizando…</p>
+                </div>
+                <span class="badge rounded-pill text-bg-danger" id="riskBadge">Evaluando…</span>
+              </div>
+              <div class="row g-3 mt-2">
+                <div class="col-sm-6">
+                  <div class="p-3 rounded-4 bg-light">
+                    <div class="text-muted small">Temperatura</div>
+                    <div class="fs-3 fw-semibold" id="tempValue">--</div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-3 rounded-4 bg-light">
+                    <div class="text-muted small">Humedad</div>
+                    <div class="fs-3 fw-semibold" id="humidityValue">--</div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-3 rounded-4 bg-light">
+                    <div class="text-muted small">Viento</div>
+                    <div class="fs-3 fw-semibold" id="windValue">--</div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-3 rounded-4 bg-light">
+                    <div class="text-muted small">Radiación solar</div>
+                    <div class="fs-3 fw-semibold" id="radiationValue">--</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h2 class="h5">Mapa y ubicación</h2>
+              <div id="map" class="map-container"></div>
+              <div class="small text-muted mt-2" id="gpsText">GPS no disponible aún.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-lg-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h3 class="h6">Parámetros WBGT</h3>
+              <ul class="small mb-0" id="wbgtList"></ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h3 class="h6">Tipo de trabajo</h3>
+              <select class="form-select" id="workType">
+                <option value="reposo">Reposo</option>
+                <option value="ligero">Ligero</option>
+                <option value="moderado" selected>Moderado</option>
+                <option value="intenso">Intenso</option>
+                <option value="muy intenso">Muy intenso</option>
+              </select>
+              <label class="form-label mt-2">Metabolismo manual</label>
+              <input type="number" class="form-control" id="metabolismManual" value="180">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h3 class="h6">Ropa y aclimatación</h3>
+              <select class="form-select mb-2" id="clothingType">
+                <option value="verano">Verano</option>
+                <option value="invierno">Invierno</option>
+                <option value="alta_visibilidad">Alta visibilidad</option>
+                <option value="impermeable">Impermeable</option>
+                <option value="quimico">Traje químico</option>
+                <option value="bombero">Bombero</option>
+                <option value="personalizado">Personalizado</option>
+              </select>
+              <input type="number" class="form-control mb-2" id="clothingCustom" placeholder="Corrección personalizada" value="1.5">
+              <select class="form-select" id="acclimatized">
+                <option value="si" selected>Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-lg-8">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h3 class="h6">Recomendaciones</h3>
+              <div id="recommendationsList" class="list-group"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h3 class="h6">Aviso AEMET</h3>
+              <div class="alert alert-info mb-2" id="aemetAlert">Consultando aviso…</div>
+              <div class="small text-muted" id="aemetDesc"></div>
+              <button class="btn btn-outline-primary mt-3" id="generatePdf">Exportar informe PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="history" class="tab-pane d-none">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+            <h2 class="h5 mb-0">Historial</h2>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control" id="historySearch" placeholder="Buscar por fecha">
+              <button class="btn btn-outline-primary" id="exportHistoryBtn">Exportar JSON</button>
+            </div>
+          </div>
+          <div class="table-responsive mt-3">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>GPS</th>
+                  <th>WBGT</th>
+                  <th>Temp.</th>
+                  <th>Humedad</th>
+                  <th>Trabajo</th>
+                  <th>Resultado</th>
+                  <th>Comentario</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="historyTable"></tbody>
+            </table>
+          </div>
+          <canvas id="historyChart" height="220"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="config" class="tab-pane d-none">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h2 class="h5">Configuración</h2>
+          <div class="row g-3 mt-1">
+            <div class="col-md-4">
+              <label class="form-label">Idioma</label>
+              <select class="form-select" id="languageSelect">
+                <option value="es" selected>Español</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tema</label>
+              <select class="form-select" id="themeSelect">
+                <option value="light" selected>Claro</option>
+                <option value="dark">Oscuro</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Intervalo de actualización</label>
+              <select class="form-select" id="intervalSelect">
+                <option value="300000">5 minutos</option>
+                <option value="600000">10 minutos</option>
+                <option value="900000">15 minutos</option>
+                <option value="1800000">30 minutos</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Unidades</label>
+              <select class="form-select" id="unitsSelect">
+                <option value="metric" selected>Métricas</option>
+                <option value="imperial">Imperiales</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3" id="saveConfigBtn">Guardar configuración</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/wbgt.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/aemet.js"></script>
+  <script src="js/gps.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/pdf.js"></script>
+  <script src="js/pwa.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
