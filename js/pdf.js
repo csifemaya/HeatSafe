@@ -8,7 +8,7 @@
     const risk = ns.state?.lastRisk || { label: 'Sin evaluar' };
     return `
       <div style="font-family: Arial, sans-serif; padding: 24px; color: #14213d;">
-        <h2 style="color:#00529B; margin-bottom: 8px;">CSIF HeatSafe</h2>
+        <h2 style="color:#00529B; margin-bottom: 8px;">CSIF Estrés Térmico</h2>
         <p style="margin:0 0 12px;">Informe profesional de evaluación de riesgo térmico</p>
         <hr>
         <p><strong>Empresa:</strong> ${company.name || 'CSIF'}</p>
@@ -39,7 +39,8 @@
     }
 
     const html = buildReportHtml();
-    reportWindow.document.write(`<!doctype html><html><head><title>Informe CSIF HeatSafe</title><style>body{font-family:Arial,sans-serif;padding:24px;}</style></head><body>${html}</body></html>`);
+    reportWindow.document.write(`<!doctype html><html><head><title>Informe CSIF Estrés Térmico</title>
+    <style>body{font-family:Arial,sans-serif;padding:24px;}</style></head><body>${html}</body></html>`);
     reportWindow.document.close();
     reportWindow.focus();
     reportWindow.print();
